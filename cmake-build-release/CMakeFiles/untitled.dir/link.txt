@@ -1,0 +1,1 @@
+/usr/bin/c++  -std=c++11 -pthread -O3 -DNDEBUG   CMakeFiles/untitled.dir/main.cpp.o CMakeFiles/untitled.dir/algo/integral.cpp.o CMakeFiles/untitled.dir/algo/matrix_utils.cpp.o CMakeFiles/untitled.dir/algo/graph.cpp.o  -o untitled 
