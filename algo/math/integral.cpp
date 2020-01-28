@@ -1,4 +1,3 @@
-#include <thread>
 #include "integral.h"
 
 template<typename T>

@@ -2,14 +2,16 @@
 #define UNTITLED_INTEGRAL_H
 
 #include <functional>
+#include <thread>
 #include <mutex>
 
 namespace _1D {
+
+
     template<typename T>
     class integral {
     public:
         integral() = default;
-
         double operator()(
                 std::function<double(T)> func,
                 double a,
@@ -18,11 +20,11 @@ namespace _1D {
         );
     };
 
+
     template<typename T>
     class concurrent_integral {
     public:
         concurrent_integral() = default;
-
         double operator()(
                 std::function<double(T)> func,
                 double a,
@@ -32,9 +34,7 @@ namespace _1D {
         );
 
     private:
-
         static std::mutex mutex;
-
         static void sub_job(
                 std::function<double(T)> func,
                 double from,

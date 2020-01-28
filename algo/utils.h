@@ -14,7 +14,9 @@ namespace chrono {
         T operator()(std::function<T(void)> block) {
             auto start = std::chrono::system_clock::now();
             auto result = block();
-            auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
+            auto end = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now() - start);
+
             std::cout << end.count() << "ms" << std::endl;
             return result;
         }
