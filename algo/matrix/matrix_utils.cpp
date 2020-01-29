@@ -1,48 +1,67 @@
-#include <thread>
-#include "matrix_utils.h"
+#include "matrix_utils.hpp"
 
-template<typename T>
-T **matrix::multiplication<T>::operator()(
-        std::vector<std::vector<T>> first,
-        std::vector<std::vector<T>> second
+template <
+        typename T,
+        std::size_t R_SIZE,
+        std::size_t C_SIZE
+>
+std::array<std::array<T, R_SIZE>, C_SIZE>
+matrix::transpose::operator()(
+        std::array<std::array<T,C_SIZE>,R_SIZE> &matrix
 ) {
-    T **result = new T *[first.size()];
-    for (int j = 0; j < first.size(); ++j) {
-        *(result + j) = new T[second[0].size()];
-    }
+    std::array<std::array<T, R_SIZE>, C_SIZE> result;
+    for (auto i = 0; i < R_SIZE; ++i)
+        for (auto j = 0; j < C_SIZE; ++j)
+            result[j][i] = matrix[i][j];
 
-    for (int i = 0; i < first.size(); ++i) {
-        for (int j = 0; j < second.at(0).size(); ++j) {
-            for (int k = 0; k < second.size(); ++k) {
-                *(*(result + i) + j) += first[i][k] * second[k][j];
-            }
-        }
-    }
     return result;
 }
 
-template<typename T>
-T **matrix::concurrent_multiplication<T>::operator()(
-        std::vector<std::vector<T>> first,
-        std::vector<std::vector<T>> second,
+
+template<
+        typename T,
+        std::size_t FR_SIZE,
+        std::size_t FC_SIZE,
+        std::size_t SC_SIZE
+>
+std::array<std::array<T, FR_SIZE>, SC_SIZE>
+matrix::multiplication::operator()(
+        std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
+        std::array<std::array<T, SC_SIZE>, FC_SIZE> &second
+) {
+    std::array<std::array<T, FR_SIZE>, SC_SIZE> result = {};
+
+    for (auto i = 0; i < FR_SIZE; ++i)
+        for (auto j = 0; j < SC_SIZE; ++j)
+            for (auto k = 0; k < FC_SIZE; ++k)
+                result[i][j] += first[i][k] * second[k][j];
+
+    return result;
+}
+
+
+template <
+        typename T,
+        std::size_t FR_SIZE,
+        std::size_t FC_SIZE,
+        std::size_t SC_SIZE
+>
+std::array<std::array<T, FR_SIZE>, SC_SIZE>
+matrix::concurrent_multiplication::operator()(
+        std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
+        std::array<std::array<T, SC_SIZE>, FC_SIZE> &second,
         int thread_count
 ) {
-    T **result = new T *[first.size()];
-    for (int j = 0; j < first.size(); ++j) {
-        *(result + j) = new T[second[0].size()];
-    }
+    std::array<std::array<T, FR_SIZE>, SC_SIZE> result = {};
 
-    auto transposed_second = matrix::transpose<T>()(second);
+    auto transposed_second = matrix::transpose()(second);
     std::thread *threads[thread_count];
     auto iterations = first.size() / thread_count;
-    for (int i = 0; i < thread_count; ++i) {
+    for (auto i = 0; i < thread_count; ++i) {
         *(threads + i) = new std::thread(
-                matrix::concurrent_multiplication<T>::sub_job,
-                first,
-                transposed_second,
-                result,
-                i * iterations,
-                (i + 1) * iterations
+                [&first, &second, &result, i, iterations]() {
+                    sub_job(first, second, result, i * iterations, (i + 1) * iterations);
+                }
         );
     }
 
@@ -53,19 +72,21 @@ T **matrix::concurrent_multiplication<T>::operator()(
     return result;
 }
 
-template<typename T>
-void matrix::concurrent_multiplication<T>::sub_job(
-        std::vector<std::vector<T>> first,
-        std::vector<std::vector<T>> second,
-        T **result,
+template <
+        typename T,
+        std::size_t FR_SIZE,
+        std::size_t FC_SIZE,
+        std::size_t SC_SIZE
+>
+void matrix::concurrent_multiplication::sub_job(
+        std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
+        std::array<std::array<T, SC_SIZE>, FC_SIZE> &second,
+        std::array<std::array<T, FR_SIZE>, SC_SIZE> &result,
         int from,
         int to
-) {
-    for (int i = from; i < to; ++i) {
-        for (int j = 0; j < second.size(); ++j) {
-            for (int k = 0; k < second.size(); ++k) {
-                *(*(result + i) + j) += first[i][k] * second[j][k];
-            }
-        }
-    }
+){
+    for (auto i = from; i < to; ++i)
+        for (auto j = 0; j < SC_SIZE; ++j)
+            for (auto k = 0; k < FC_SIZE; ++k)
+                result[i][j] += first[i][k] * second[k][j   ];
 }

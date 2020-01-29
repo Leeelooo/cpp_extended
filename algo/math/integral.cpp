@@ -1,4 +1,4 @@
-#include "integral.h"
+#include "integral.hpp"
 
 template<typename T>
 std::mutex _1D::concurrent_integral<T>::mutex;
@@ -12,7 +12,7 @@ double _1D::integral<T>::operator()(
 ) {
     double result_ = 0;
     double diff = (b - a) / steps;
-    for (double i = a; i < b; i += diff) {
+    for (auto i = a; i < b; i += diff) {
         result_ += diff * (func(i) + func(i + diff)) / 2;
     }
 
@@ -34,14 +34,9 @@ double _1D::concurrent_integral<T>::operator()(
 
     std::thread *threads[thread_count];
     for (int i = 0; i < thread_count; i++) {
-        *(threads + i) = new std::thread(
-                _1D::concurrent_integral<T>::sub_job,
-                func,
-                a + i * job_diff,
-                a + (i + 1) * job_diff,
-                diff,
-                std::ref(result)
-        );
+        *(threads + i) = new std::thread([func, a, b, diff, job_diff, &result, i]() {
+            sub_job(func, a + i * job_diff, a + (i + 1) * job_diff, diff, result);
+        });
     }
 
     for (auto thr :threads) {
@@ -60,7 +55,7 @@ void _1D::concurrent_integral<T>::sub_job(
         double &result
 ) {
     double local_sum = 0;
-    for (double i = from; i < to; i += diff) {
+    for (auto i = from; i < to; i += diff) {
         local_sum += diff * (func(i) + func(i + diff)) / 2;
     }
     std::lock_guard<std::mutex> lock(mutex);
