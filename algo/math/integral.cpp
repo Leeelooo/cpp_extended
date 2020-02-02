@@ -29,20 +29,31 @@ double _1D::concurrent_integral<T>::operator()(
 ) {
     double result = 0;
 
-    double diff = (b - a) / steps;
-    double job_diff = diff * (steps / thread_count);
+    auto diff = (b - a) / steps;
+    auto job_diff = diff * (steps / thread_count);
+    auto job_remainder = steps % thread_count;
+    auto last_start = a;
 
     std::thread *threads[thread_count];
     for (int i = 0; i < thread_count; i++) {
-        *(threads + i) = new std::thread([func, a, b, diff, job_diff, &result, i]() {
-            sub_job(func, a + i * job_diff, a + (i + 1) * job_diff, diff, result);
-        });
+        auto remainder = i < job_remainder ? diff : 0;
+        *(threads + i) = new std::thread(
+                [func, last_start, job_diff, remainder, diff, &result]() {
+                    sub_job(
+                            func,
+                            last_start,
+                            last_start + job_diff + remainder,
+                            diff,
+                            result
+                    );
+                });
+        last_start += job_diff + remainder;
     }
 
-    for (auto thr :threads) {
+    for (auto thr :threads)
         if (thr->joinable())
             thr->join();
-    }
+
     return result;
 }
 

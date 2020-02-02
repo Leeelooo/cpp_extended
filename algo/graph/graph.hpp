@@ -1,6 +1,9 @@
 #ifndef UNTITLED_GRAPH_HPP
 #define UNTITLED_GRAPH_HPP
 
+#include <climits>
+#include <vector>
+#include <thread>
 #include <array>
 #include <mutex>
 

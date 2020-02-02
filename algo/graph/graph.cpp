@@ -1,6 +1,3 @@
-#include <vector>
-#include <climits>
-#include <thread>
 #include "graph.hpp"
 
 std::mutex graph::concurrent_dijkstra::mutex;

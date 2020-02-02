@@ -5,4 +5,6 @@
 #include "math/integral.hpp"
 #include "matrix/matrix_utils.hpp"
 
+class pepega { };
+
 #endif //UNTITLED_ALGO_HPP

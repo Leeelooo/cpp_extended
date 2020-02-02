@@ -56,13 +56,19 @@ matrix::concurrent_multiplication::operator()(
 
     auto transposed_second = matrix::transpose()(second);
     std::thread *threads[thread_count];
-    auto iterations = first.size() / thread_count;
+
+    auto job_diff = first.size() / thread_count;
+    auto job_remainder = first.size() % thread_count;
+    auto last_start = 0;
+
     for (auto i = 0; i < thread_count; ++i) {
+        auto remainder = i < job_remainder;
         *(threads + i) = new std::thread(
-                [&first, &second, &result, i, iterations]() {
-                    sub_job(first, second, result, i * iterations, (i + 1) * iterations);
+                [&first, &second, &result, last_start, job_diff, remainder]() {
+                    sub_job(first, second, result, last_start, last_start + job_diff + remainder);
                 }
         );
+        last_start += job_diff + remainder;
     }
 
     for (auto thr : threads)
