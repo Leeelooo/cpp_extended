@@ -1,9 +1,8 @@
 #include <fstream>
-#include "algo/math/integral.cpp"
-#include "algo/matrix/matrix_utils.cpp"
+#include "integral.cpp"
+#include "matrix_utils.cpp"
 #include "utils.hpp"
 
-#define INTEGRAL_STEPS 1000000000l
 #define MATRIX_SIZE 600
 
 // void test_graph() {
@@ -33,25 +32,6 @@
 //     });
 // }
 
-void test_integral() {
-    chrono::time_block<double>()([]() {
-        return _1D::integral<double>()(
-                [](double x) { return 3 * x * x - 2 * x - 1 / x / x; },
-                1,
-                2,
-                INTEGRAL_STEPS
-        );
-    });
-
-    chrono::time_block<double>()([]() {
-        return _1D::concurrent_integral<double>()(
-                [](double x) { return 3 * x * x - 2 * x - 1 / x / x; },
-                1,
-                2,
-                INTEGRAL_STEPS
-        );
-    });
-}
 
 void test_matrix() {
     std::array<std::array<int, MATRIX_SIZE>, MATRIX_SIZE> first;
@@ -78,7 +58,6 @@ void test_matrix() {
 }
 
 int main() {
-    test_integral();
     test_matrix();
     // test_graph();
 }

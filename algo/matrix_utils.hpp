@@ -31,7 +31,7 @@ namespace matrix {
                 std::size_t FC_SIZE,
                 std::size_t SC_SIZE
         >
-        std::array<std::array<T, FR_SIZE>, SC_SIZE> operator()(
+        std::array<std::array<T, SC_SIZE>, FR_SIZE> operator()(
                 std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
                 std::array<std::array<T, SC_SIZE>, FC_SIZE> &second
         );
@@ -48,10 +48,10 @@ namespace matrix {
                 std::size_t FC_SIZE,
                 std::size_t SC_SIZE
         >
-        std::array<std::array<T, FR_SIZE>, SC_SIZE> operator()(
+        std::array<std::array<T, SC_SIZE>, FR_SIZE> operator()(
                 std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
                 std::array<std::array<T, SC_SIZE>, FC_SIZE> &second,
-                int thread_count
+                int thread_count = 4
         );
 
     private:
@@ -64,7 +64,7 @@ namespace matrix {
         static void sub_job(
                 std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
                 std::array<std::array<T, SC_SIZE>, FC_SIZE> &second,
-                std::array<std::array<T, FR_SIZE>, SC_SIZE> &result,
+                std::array<std::array<T, SC_SIZE>, FR_SIZE> &result,
                 int from,
                 int to
         );

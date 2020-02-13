@@ -10,13 +10,14 @@ double _1D::integral<T>::operator()(
         double b,
         long steps
 ) {
-    double result_ = 0;
+    double result = 0;
     double diff = (b - a) / steps;
-    for (auto i = a; i < b; i += diff) {
-        result_ += diff * (func(i) + func(i + diff)) / 2;
+    double i;
+    for (i = a; i < b; i += diff) {
+        result += diff * (func(i) + func(i + diff)) / 2;
     }
 
-    return result_;
+    return result;
 }
 
 template<typename T>
@@ -66,7 +67,8 @@ void _1D::concurrent_integral<T>::sub_job(
         double &result
 ) {
     double local_sum = 0;
-    for (auto i = from; i < to; i += diff) {
+    double i;
+    for (i = from; i < to; i += diff) {
         local_sum += diff * (func(i) + func(i + diff)) / 2;
     }
     std::lock_guard<std::mutex> lock(mutex);

@@ -24,12 +24,12 @@ template<
         std::size_t FC_SIZE,
         std::size_t SC_SIZE
 >
-std::array<std::array<T, FR_SIZE>, SC_SIZE>
+std::array<std::array<T, SC_SIZE>, FR_SIZE>
 matrix::multiplication::operator()(
         std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
         std::array<std::array<T, SC_SIZE>, FC_SIZE> &second
 ) {
-    std::array<std::array<T, FR_SIZE>, SC_SIZE> result = {};
+    std::array<std::array<T, SC_SIZE>, FR_SIZE>result = {};
 
     for (auto i = 0; i < FR_SIZE; ++i)
         for (auto j = 0; j < SC_SIZE; ++j)
@@ -46,19 +46,19 @@ template <
         std::size_t FC_SIZE,
         std::size_t SC_SIZE
 >
-std::array<std::array<T, FR_SIZE>, SC_SIZE>
+std::array<std::array<T, SC_SIZE>, FR_SIZE>
 matrix::concurrent_multiplication::operator()(
         std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
         std::array<std::array<T, SC_SIZE>, FC_SIZE> &second,
         int thread_count
 ) {
-    std::array<std::array<T, FR_SIZE>, SC_SIZE> result = {};
+    std::array<std::array<T, SC_SIZE>, FR_SIZE> result = {};
 
     auto transposed_second = matrix::transpose()(second);
     std::thread *threads[thread_count];
 
-    auto job_diff = first.size() / thread_count;
-    auto job_remainder = first.size() % thread_count;
+    auto job_diff = FR_SIZE / thread_count;
+    auto job_remainder = FR_SIZE % thread_count;
     auto last_start = 0;
 
     for (auto i = 0; i < thread_count; ++i) {
@@ -87,7 +87,7 @@ template <
 void matrix::concurrent_multiplication::sub_job(
         std::array<std::array<T, FC_SIZE>, FR_SIZE> &first,
         std::array<std::array<T, SC_SIZE>, FC_SIZE> &second,
-        std::array<std::array<T, FR_SIZE>, SC_SIZE> &result,
+        std::array<std::array<T, SC_SIZE>, FR_SIZE> &result,
         int from,
         int to
 ){

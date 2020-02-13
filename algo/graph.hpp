@@ -6,6 +6,7 @@
 #include <thread>
 #include <array>
 #include <mutex>
+#include <atomic>
 
 namespace graph {
 
@@ -36,17 +37,16 @@ namespace graph {
     private:
         static std::mutex mutex;
 
-        template<typename ITER_DIS, typename ITER_QUEUE>
+        template<std::size_t SIZE>
         static void sub_job(
-            ITER_DIS distances_begin,
-            ITER_DIS distances_end,
-            ITER_QUEUE queue_begin,
-            ITER_QUEUE queue_end,
-            ITER_QUEUE used_begin,
-            ITER_QUEUE used_end,
-            int &ref,
-            int &next_queue_ready,
-            int &queue_size_ref 
+                std::array<std::array<long long, SIZE>, SIZE> &weights,
+                std::array<long long, SIZE> &distances,
+                std::array<char, SIZE> &queue,
+                std::atomic<int> &flag,
+                int &min_index,
+                int thread_count,
+                int from,
+                int to
         );
     };
 

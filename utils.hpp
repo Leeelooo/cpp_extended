@@ -23,24 +23,6 @@ namespace chrono {
     };
 }
 
-namespace array {
-    class print {
-    public:
-        template<typename T, std::size_t SIZE>
-        void operator()(std::array<T, SIZE> array) {
-            for (auto &x: array)
-                std::cout << x << ' ';
-            std::cout << std::endl;
-        }
-
-        template<typename T, std::size_t R_SIZE, std::size_t C_SIZE>
-        void operator()( std::array<std::array<T, C_SIZE>, R_SIZE> array) {
-            for (auto &xs: array)
-                print()(xs);
-        }
-    };
-}
-
 namespace ptr {
     template<typename T>
     class unique {
